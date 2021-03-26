@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Welcome, {{ current_user.username }}</h1>
+    <table>
+        <thead>
+            <tr>
+                <td>Make</td>
+                <td>Model</td>
+                <td>IP</td>
+                <td>MAC</td>
+            </tr>
+        </thead>
+        {% for camera in cameras %}
+        <tr>
+            <td>{{ camera.make }}</td>
+            <td>{{ camera.model }}</td>
+            <td>{{ camera.ip }}</td>
+            <td>{{ camera.mac }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
