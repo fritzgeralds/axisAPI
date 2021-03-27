@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Scan for new cameras</h1>
+    <form action='' method='post' novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.subnet1.label }}<br>
+            {{ form.subnet1(size=1) }} {{ form.subnet2(size=1) }} {{ form.subnet3(size=1) }} {{ form.subnet4(size=1) }}
+            {% for error in form.subnet1.errors %}
+            <span style='color:red'>{{ error }}</span
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}

@@ -7,3 +7,10 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Login')
+
+class ScanForm(FlaskForm):
+    subnet1 = StringField('Subnet', validators=[DataRequired()])
+    subnet2 = StringField(validators=[DataRequired()])
+    subnet3 = StringField(validators=[DataRequired()])
+    subnet4 = StringField(validators=[DataRequired()])
+    submit = SubmitField('Scan')

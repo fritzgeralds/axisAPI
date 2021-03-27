@@ -1,6 +1,6 @@
 from app import app
 from flask import render_template, flash, redirect, url_for, request
-from app.forms import LoginForm
+from app.forms import LoginForm, ScanForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 from werkzeug.urls import url_parse
@@ -172,3 +172,9 @@ def logout():
 @login_required
 def settings():
     return render_template('settings.html', title='Settings - AXIS Config Tool')
+
+@app.route('/scan', methods=['POST'])
+@login_required
+def scan():
+    form = ScanForm()
+    return render_template('scan.html', title='Scan - AXIS Config Tool', form=form)
