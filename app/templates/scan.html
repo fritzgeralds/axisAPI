@@ -1,16 +1,55 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script type=text/javascript>
+    $(document).ready(function() {
+        $('.input').keyup(function() {
+          if (this.value.length > 2) {
+            $('.input').eq($('.input').index(this) + 1).focus();
+          }
+        });
+        $('.input').keyup(function(event) {
+          if (this.value.length == 0 && event.keyCode == 8) {
+            $('.input').eq($('.input').index(this) - 1).focus();
+          }
+        });
+        $('.input').keydown(function(event) {
+          if (event.keyCode == 110 || event.keyCode == 190) {
+            event.preventDefault();
+            if (this.value.length > 0) {
+                $('.input').eq($('.input').index(this) + 1).focus();
+            }
+          }
+        });
+    });
+    </script>
     <h1>Scan for new cameras</h1>
     <form action='' method='post' novalidate>
         {{ form.hidden_tag() }}
         <p>
             {{ form.subnet1.label }}<br>
-            {{ form.subnet1(size=1) }} {{ form.subnet2(size=1) }} {{ form.subnet3(size=1) }} {{ form.subnet4(size=1) }}
+            {{ form.subnet1(size=1, autofocus=True, class='input', id='subnet1') }} {{ form.subnet2(size=1, class='input', id='subnet2') }} {{ form.subnet3(size=1, class='input', id='subnet3') }} {{ form.subnet4(size=1, readonly="readonly", value='0') }}
             {% for error in form.subnet1.errors %}
             <span style='color:red'>{{ error }}</span
             {% endfor %}
         </p>
         <p>{{ form.submit() }}</p>
     </form>
+    <table>
+        <tr>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>MAC</th>
+            <th>IP</th>
+        </tr>
+        {% for i in cameras %}
+        <tr>
+            <td>{{ i[0] }}</td>
+            <td>{{ i[1] }}</td>
+            <td>{{ i[2] }}</td>
+            <td>{{ i[3] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 {% endblock %}

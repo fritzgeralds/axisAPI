@@ -1,8 +1,9 @@
 from app import app
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from app.forms import LoginForm, ScanForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
+from app.scanner import camera_scan
 from werkzeug.urls import url_parse
 
 @app.route('/')
@@ -173,8 +174,27 @@ def logout():
 def settings():
     return render_template('settings.html', title='Settings - AXIS Config Tool')
 
-@app.route('/scan', methods=['POST'])
+@app.route('/scan', methods=['GET', 'POST'])
 @login_required
 def scan():
     form = ScanForm()
-    return render_template('scan.html', title='Scan - AXIS Config Tool', form=form)
+    if form.validate_on_submit():
+        cameras = []
+        subnet = form.subnet1.data + '.' + form.subnet2.data + '.' + form.subnet3.data + '.' + form.subnet4.data
+#        for i in camera_scan(subnet):
+#            cam = i
+#            cameras.append([cam[0],cam[1],cam[2],cam[3]])
+        cameras = camera_scan(subnet)
+    return render_template('scan.html', title='Scan - AXIS Config Tool', form=form, cameras=cameras)
+
+@app.route('/new_scan', methods=['GET', 'POST'])
+@login_required
+def scanner():
+    oct1 = request.args.get('oct1')
+    oct2 = request.args.get('oct2')
+    oct3 = request.args.get('oct3')
+    subnet = f'{oct1}.{oct2}.{oct3}.0'
+    for i in camera_scan(subnet):
+        cam = i
+        camera = [cam[0],cam[1],cam[2],cam[3]]
+        print(camera)
