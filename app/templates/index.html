@@ -4,6 +4,7 @@
     <table>
         <thead>
             <tr>
+                <td>ID</td>
                 <td>Make</td>
                 <td>Model</td>
                 <td>IP</td>
@@ -12,10 +13,11 @@
         </thead>
         {% for camera in cameras %}
         <tr>
+            <td>{{ camera.id }}</td>
             <td>{{ camera.make }}</td>
             <td>{{ camera.model }}</td>
-            <td>{{ camera.ip }}</td>
             <td>{{ camera.mac }}</td>
+            <td>{{ camera.ip }}</td>
         </tr>
         {% endfor %}
     </table>

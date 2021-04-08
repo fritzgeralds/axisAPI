@@ -1,6 +1,8 @@
-import sys, ipaddress, subprocess, socket, requests, xml.etree.ElementTree as et
+import ipaddress, subprocess, requests, xml.etree.ElementTree as et
 from requests.auth import HTTPDigestAuth
 from scapy.all import Ether, ARP, srp
+from app.models import Camera
+from app import db
 cameras = []
 
 def camera_scan(subnet):
@@ -52,9 +54,16 @@ def camera_scan(subnet):
                           auth=HTTPDigestAuth(user, pwd))
         make, model, mac, ip = et.fromstring(s.text)[0].text.split(' ')[0], ' '.join(et.fromstring(s.text)[0].text.split(' ')[1:]),\
                        et.fromstring(s.text)[2][0][1].attrib['value'], et.fromstring(s.text)[2][0][0].attrib['value']
-        print(f'{make},{model},{mac},{ip}')
-        listz.append([make,model,mac,ip])
-#        yield [make,model,mac,ip]
+        newcam = Camera.query.filter_by(mac=mac).first()
+        if newcam is None:
+            newcam = Camera(make=make, model=model, mac=mac, ip=ip)
+            db.session.add(newcam)
+            db.session.commit()
+            listz.append([make,model,mac,ip])
+        else:
+            continue
         i += 1
-    print('\nFound ' + str(len(cameras)) + ' cameras.')
-    return listz
+    if len(listz) == 0:
+        return
+    else:
+        return listz
