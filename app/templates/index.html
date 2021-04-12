@@ -1,24 +1,49 @@
 {% extends 'base.html' %}
 {% block content %}
+    <script type="text/javascript">
+        $(document).ready( function () {
+            $('.table').DataTable();
+        });
+    </script>
     <h1>Welcome, {{ current_user.username }}</h1>
-    <table>
+    <table id="myTable" class="table table-striped" data-page-length='10'>
         <thead>
             <tr>
-                <td>ID</td>
-                <td>Make</td>
-                <td>Model</td>
-                <td>IP</td>
-                <td>MAC</td>
+                <th scope="col">ID</th>
+                <th scope="col">Make</th>
+                <th scope="col">Model</th>
+                <th scope="col">MAC</th>
+                <th scope="col">IP</th>
+                <th scope="col"></th>
             </tr>
         </thead>
+        <tbody>
         {% for camera in cameras %}
         <tr>
-            <td>{{ camera.id }}</td>
-            <td>{{ camera.make }}</td>
-            <td>{{ camera.model }}</td>
-            <td>{{ camera.mac }}</td>
-            <td>{{ camera.ip }}</td>
+            <td class="row-data">{{ camera.id }}</td>
+            <td class="row-data">{{ camera.make }}</td>
+            <td class="row-data">{{ camera.model }}</td>
+            <td class="row-data">{{ camera.mac }}</td>
+            <td class="row-data"><a href="/info/{{ camera.ip }}">{{ camera.ip }}</a></td>
+            <td><button type="button" class="btn btn-default" id="mybutton" onclick="show(this)">Remove</button></td>
         </tr>
         {% endfor %}
+        </tbody>
     </table>
+    <div>
+        <p>Recount cameras:</p>
+        <button type="button" class="btn btn-default" onclick="alert(document.getElementById('myTable').rows.length - 1)">Count</button>
+    </div>
+    <script>
+        function deleteRow(r) {
+            var i = r.parentNode.parentNode.rowIndex;
+            document.getElementById("myTable").deleteRow(i);
+        }
+        function show(r) {
+            var i = r.parentNode.parentNode.rowIndex;
+            var data = document.getElementById("myTable").rows[i];
+                $.getJSON('/remove?q=' + data.cells[3].innerText.replace(/:/g,''));
+            document.getElementById("myTable").deleteRow(i);
+            }
+    </script>
 {% endblock %}

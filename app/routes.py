@@ -1,4 +1,4 @@
-from app import app
+from app import app, db
 from flask import render_template, flash, redirect, url_for, request
 from app.forms import LoginForm, ScanForm
 from flask_login import current_user, login_user, logout_user, login_required
@@ -61,3 +61,28 @@ def scanner():
         cam = i
         camera = [cam[0],cam[1],cam[2],cam[3]]
         print(camera)
+
+
+@app.route('/test')
+def json():
+    return render_template('info.html')
+
+@app.route('/remove')
+def remove():
+    r = ':'.join(request.args.get('q')[i:i + 2] for i in range(0, len(request.args.get('q')), 2))
+    cam = Camera.query.filter_by(mac=r).first()
+    db.session.delete(cam)
+    db.session.commit()
+    return "Nothing"
+
+@app.route('/info/<ip>')
+@login_required
+def info(ip):
+    cam = Camera.query.filter_by(ip=ip).first_or_404()
+    conf = {
+        'make': cam.make,
+        'model': cam.model,
+        'mac': cam.mac,
+        'ip': cam.ip
+    }
+    return render_template('info.html', cam=cam, conf=conf)
