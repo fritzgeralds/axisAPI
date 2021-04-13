@@ -1,5 +1,6 @@
-import ipaddress, subprocess, requests, xml.etree.ElementTree as et
+import ipaddress, subprocess, requests, xml.etree.ElementTree as et, json
 from requests.auth import HTTPDigestAuth
+from types import SimpleNamespace
 from scapy.all import Ether, ARP, srp
 from app.models import Camera
 from app import db
@@ -67,3 +68,26 @@ def camera_scan(subnet):
         return
     else:
         return listz
+
+def camera_info(ip):
+    info = {}
+    user = 'root'
+    passwd = 'ABM@ABM821'
+    url = f'http://{ip}/axis-cgi/network_settings.cgi'
+    url2 = f'http://{ip}/axis-cgi/basicdeviceinfo.cgi'
+    j = {"apiVersion":"1.0","method":"getNetworkInfo"}
+    j2 = {'apiVersion':'1.0','method':'getAllProperties'}
+
+    r = requests.post(url, auth=HTTPDigestAuth(user,passwd), json=j)
+    r2 = requests.post(url2, auth=HTTPDigestAuth(user,passwd), json=j2)
+    r = json.loads(r.text, object_hook=lambda d: SimpleNamespace(**d))
+    r2 = json.loads(r2.text, object_hook=lambda d: SimpleNamespace(**d))
+    info['fwver'] = r2.data.propertyList.Version
+    info['model'] = r2.data.propertyList.ProdNbr
+    info['hostname'] = r.data.system.hostname.hostname
+    info['dns'] = r.data.system.resolver.nameServers[0]
+    info['dhcp'] = r.data.devices[0].IPv4.configurationMode
+    info['mac'] = r.data.devices[0].macAddress
+    info['ip'] = r.data.devices[0].IPv4.addresses[0].address
+
+    return info

@@ -22,11 +22,27 @@ class Camera(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     make = db.Column(db.String(64))
     model = db.Column(db.String(128))
-    ip = db.Column(db.String(15))
+    ip = db.Column(db.String(15), index=True)
     mac = db.Column(db.String(17), unique=True)
 
     def __repr__(self):
         return '<Camera {}>'.format(self.mac)
+
+class Company(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), index=True, unique=True)
+    sites = db.relationship('Site', backref='comp', lazy='dynamic')
+    pass
+
+class Site(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    company = db.Column(db.String(255), db.ForeignKey('company.name'))
+    name = db.Column(db.String(255), index=True, unique=True)
+    nvr = db.Column(db.String(15), index=True)
+    subnet = db.Column(db.String(15), index=True)
+    remote = db.Column(db.Boolean)
+    remaddr = db.Column(db.String(255))
+    pass
 
 @login.user_loader
 def load_user(id):

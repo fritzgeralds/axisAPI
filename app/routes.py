@@ -1,9 +1,9 @@
 from app import app, db
 from flask import render_template, flash, redirect, url_for, request
-from app.forms import LoginForm, ScanForm
+from app.forms import LoginForm, ScanForm, AddCompany
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, Camera
-from app.scanner import camera_scan
+from app.models import User, Camera, Company, Site
+from app.scanner import camera_scan, camera_info
 from werkzeug.urls import url_parse
 
 @app.route('/')
@@ -63,9 +63,22 @@ def scanner():
         print(camera)
 
 
-@app.route('/test')
-def json():
-    return render_template('info.html')
+@app.route('/add', methods=['GET', 'POST'])
+def test():
+    form = AddCompany()
+    if form.validate_on_submit():
+        comp = Company.query.filter_by(name=form.name.data).first()
+        if comp is None:
+            newcomp = Company(name=form.name.data)
+            db.session.add(newcomp)
+            db.session.commit()
+        newsite = Site(name=form.site.data, company=form.name.data, nvr=form.nvr.data,
+                       subnet=form.subnet.data, remote=form.remote.data, remaddr=form.remaddr.data)
+        db.session.add(newsite)
+        db.session.commit()
+        flash('Company Added Successfully!')
+        return redirect(url_for('index'))
+    return render_template('add.html', form=form)
 
 @app.route('/remove')
 def remove():
@@ -79,10 +92,6 @@ def remove():
 @login_required
 def info(ip):
     cam = Camera.query.filter_by(ip=ip).first_or_404()
-    conf = {
-        'make': cam.make,
-        'model': cam.model,
-        'mac': cam.mac,
-        'ip': cam.ip
-    }
+    conf = camera_info(ip)
+    print(conf)
     return render_template('info.html', cam=cam, conf=conf)

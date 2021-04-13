@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+    <form action='' method='post' novalidate>
+        {{ form.hidden_tag() }}
+        <h3>Company Name:</h3>
+        <div>
+            {{ form.name(size=32) }}<br>
+            {% for error in form.name.errors %}
+            <span style='color:red'>{{ error }}</span>
+            {% endfor %}
+        </div><br>
+        <h3>Site Name:</h3>
+        <div>
+            {{ form.site(size=32) }}<br>
+            {% for error in form.site.errors %}
+            <span style='color:red'>{{ error }}</span>
+            {% endfor %}
+        </div><br>
+        <h3>Network Info:</h3>
+        <div>
+            <h5>{{ form.nvr.label }}</h5>
+            {{ form.nvr(size=32) }}<br>
+            {% for error in form.nvr.errors %}
+            <span style='color:red'>{{ error }}</span>
+            {% endfor %}
+        </div><br>
+        <div>
+            <h5>{{ form.subnet.label }}</h5>
+            {{ form.subnet(size=32) }}<br>
+            {% for error in form.subnet.errors %}
+            <span style='color:red'>{{ error }}</span>
+            {% endfor %}
+        </div><br>
+        <div>
+            <h5>{{ form.remote.label }}</h5>
+            {{ form.remote }}<br>
+            {% for error in form.remote.errors %}
+            <span style='color:red'>{{ error }}</span>
+            {% endfor %}
+            <p>
+                <h5>{{ form.remaddr.label }}</h5>
+                {{ form.remaddr(size=32) }}<br>
+                {% for error in form.remaddr.errors %}
+                <span style='color:red'>{{ error }}</span>
+                {% endfor %}
+            </p>
+        </div>
+        <div> {{ form.submit() }}</div>
+    </form>
+</div>
+{% endblock %}
