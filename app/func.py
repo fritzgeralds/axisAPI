@@ -1,10 +1,16 @@
-import ipaddress, subprocess, requests, xml.etree.ElementTree as et, json
+import ipaddress, subprocess, requests, socket, struct, xml.etree.ElementTree as et, json
 from requests.auth import HTTPDigestAuth
 from types import SimpleNamespace
 from scapy.all import Ether, ARP, srp
 from app.models import Camera
 from app import db
+
 cameras = []
+
+def pre2mask(prefix):
+    bits = 32 - int(prefix)
+    netmask = socket.inet_ntoa(struct.pack('!I', (1 << 32) - (1 << bits)))
+    return netmask
 
 def camera_scan(subnet):
     _subnet = '.'.join(subnet.split('.')[0:3])
@@ -73,6 +79,8 @@ def camera_info(ip):
     info = {}
     user = 'root'
     passwd = 'ABM@ABM821'
+    c = 'MPQT'
+    m = 'PACS'
     url = f'http://{ip}/axis-cgi/network_settings.cgi'
     url2 = f'http://{ip}/axis-cgi/basicdeviceinfo.cgi'
     j = {"apiVersion":"1.0","method":"getNetworkInfo"}
@@ -83,11 +91,19 @@ def camera_info(ip):
     r = json.loads(r.text, object_hook=lambda d: SimpleNamespace(**d))
     r2 = json.loads(r2.text, object_hook=lambda d: SimpleNamespace(**d))
     info['fwver'] = r2.data.propertyList.Version
+    info['make'] = r2.data.propertyList.Brand
     info['model'] = r2.data.propertyList.ProdNbr
-    info['hostname'] = r.data.system.hostname.hostname
-    info['dns'] = r.data.system.resolver.nameServers[0]
+    info['hostname'] = (r.data.system.hostname.hostname).upper()
+    info['dns'] = ', '.join(r.data.system.resolver.nameServers)
     info['dhcp'] = r.data.devices[0].IPv4.configurationMode
-    info['mac'] = r.data.devices[0].macAddress
-    info['ip'] = r.data.devices[0].IPv4.addresses[0].address
+    info['mac'] = (r.data.devices[0].macAddress).upper()
+    if info['dhcp'] == 'static':
+        info['ip'] = r.data.devices[0].IPv4.staticAddressConfigurations[0].address
+        info['gateway'] = r.data.devices[0].IPv4.staticDefaultRouter
+        info['netmask'] = pre2mask(r.data.devices[0].IPv4.staticAddressConfigurations[0].prefixLength)
+    else:
+        info['ip'] = r.data.devices[0].IPv4.addresses[0].address
+        info['gateway'] = r.data.devices[0].IPv4.defaultRouter
+        info['netmask'] = pre2mask(r.data.devices[0].IPv4.addresses[0].prefixLength)
 
     return info

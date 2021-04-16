@@ -1,25 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>{{ cam.make }} {{ cam.model }}</h1>
+    <h1>{{ conf.make }} {{ conf.model }}</h1>
     <hr>
     <div>
         <h3>Basic Info:</h3>
         <p><b>Firmware:</b> <i>{{ conf.fwver }}</i></p>
+        <p><b>Hostname:</b> <i>{{ conf.hostname }}</i></p>
     </div>
     <div>
         <h3>Network Info:</h3>
-        <p><b>Hostname:</b> <i>{{ conf.hostname }}</i></p>  <!-- ['data']['system']['hostname']['hostname'] -->
-        <p><b>DNS:</b> <i>{{ conf.dns }}</i></p>            <!-- ['data']['system']['resolver']['nameServers'] -->
-        <p><b>DHCP/Static:</b> <i>{{ conf.dhcp }}</i></p>   <!-- ['data']['devices'][0]['IPv4']['configurationMode'] -->
-        <p><b>IP:</b> <i>{{ conf.ip }}</i></p>              <!-- ['data']['devices'][0]['IPv4']['addresses'][0]['address'] -->
+        <p><b>DHCP/Static:</b> <i>{{ conf.dhcp }}</i></p>
+        <p><b>IP:</b> <i>{{ conf.ip }}</i></p>
+        <p><b>Mask:</b> <i>{{ conf.netmask }}</i></p>
+        <p><b>Gateway:</b> <i>{{ conf.gateway }}</i></p>
+        <p><b>DNS:</b> <i>{{ conf.dns }}</i></p>
         <p><b>MAC:</b> <i>{{ conf.mac }}</i></p>
-        <p><b>Firmware:</b> <i>{{ conf.fwver }}</i></p>
     </div>
     <div>
         <h3>Misc Info:</h3>
-        <p><b>MAC:</b> <i>{{ conf.mac }}</i></p>
-        <p><b>IP:</b> <i>{{ conf.ip }}</i></p>
-        <p><b>Firmware:</b> <i>{{ conf.fwver }}</i></p>
     </div>
 {% endblock %}

@@ -3,7 +3,7 @@ from flask import render_template, flash, redirect, url_for, request
 from app.forms import LoginForm, ScanForm, AddCompany
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Camera, Company, Site
-from app.scanner import camera_scan, camera_info
+from app.func import camera_scan, camera_info
 from werkzeug.urls import url_parse
 
 @app.route('/')
