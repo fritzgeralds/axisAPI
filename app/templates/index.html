@@ -2,14 +2,48 @@
 {% block content %}
     <script type="text/javascript">
         $(document).ready( function () {
-            $('.table').DataTable();
+          $('.table').DataTable();
+          $('#customers').change(function() {
+
+            var customer = $('#customers').val();
+
+            // Make Ajax Request and expect JSON-encoded data
+            $.getJSON(
+              '/get_sites' + '/' + customer,
+              function(data) {
+
+                // Remove old options
+                $('#sites').find('option').remove();
+
+                // Add new items
+                $.each(data, function(key, val) {
+                  var option_item = '<option value="' + val + '">' + val + '</option>'
+                  $('#sites').append(option_item);
+                });
+              }
+            );
+          });
         });
     </script>
     <h1>Welcome, {{ current_user.username }}</h1>
+    <div>
+        <select id="customers" class="selectpicker form-control" style="width: max-content">
+            <option value="">Select Customer</option>
+            {% for customer in customers %}
+            <option value="{{ customer.name }}">{{ customer.name }}</option>
+            {% endfor %}
+        </select>
+        <select id="sites" class="selectpicker form-control" style="width: max-content">
+            <option value="">Select Site</option>
+            {% for site in sites %}
+            <option value="{{ site.name }}">{{ site.name }}</option>
+            {% endfor %}
+        </select>
+        <br>
+    </div>
     <table id="myTable" class="table table-striped" data-page-length='10'>
         <thead>
             <tr>
-                <th scope="col">ID</th>
                 <th scope="col">Make</th>
                 <th scope="col">Model</th>
                 <th scope="col">MAC</th>
@@ -20,30 +54,31 @@
         <tbody>
         {% for camera in cameras %}
         <tr>
-            <td class="row-data">{{ camera.id }}</td>
             <td class="row-data">{{ camera.make }}</td>
             <td class="row-data">{{ camera.model }}</td>
             <td class="row-data">{{ camera.mac }}</td>
             <td class="row-data"><a href="/info/{{ camera.ip }}">{{ camera.ip }}</a></td>
-            <td><button type="button" class="btn btn-default" id="mybutton" onclick="show(this)">Remove</button></td>
+            <td><button type="button" class="btn btn-default" id="mybutton" onclick="remove(this)">Remove</button> <button type="button" class="btn btn-default" id="siteButton" onclick="assign(this)">Assign Site</button> </td>
         </tr>
         {% endfor %}
         </tbody>
     </table>
-    <div>
-        <p>Recount cameras:</p>
-        <button type="button" class="btn btn-default" onclick="alert(document.getElementById('myTable').rows.length - 1)">Count</button>
-    </div>
     <script>
         function deleteRow(r) {
             var i = r.parentNode.parentNode.rowIndex;
             document.getElementById("myTable").deleteRow(i);
         }
-        function show(r) {
+        function remove(r) {
             var i = r.parentNode.parentNode.rowIndex;
             var data = document.getElementById("myTable").rows[i];
                 $.getJSON('/remove?q=' + data.cells[3].innerText.replace(/:/g,''));
             document.getElementById("myTable").deleteRow(i);
+            }
+        function assign(r) {
+            var i = r.parentNode.parentNode.rowIndex;
+            var site = prompt('Please enter site name');
+            var data = document.getElementById("myTable").rows[i];
+                $.getJSON('/assign?q=' + data.cells[2].innerText.replace(/:/g,'') + '&site=' + site);
             }
     </script>
 {% endblock %}

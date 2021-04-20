@@ -24,6 +24,7 @@ class Camera(db.Model):
     model = db.Column(db.String(128))
     ip = db.Column(db.String(15), index=True)
     mac = db.Column(db.String(17), unique=True)
+    site = db.Column(db.String(255), db.ForeignKey('site.name'))
 
     def __repr__(self):
         return '<Camera {}>'.format(self.mac)
@@ -42,6 +43,7 @@ class Site(db.Model):
     subnet = db.Column(db.String(15), index=True)
     remote = db.Column(db.Boolean)
     remaddr = db.Column(db.String(255))
+    cameras = db.relationship('Camera', backref='cams', lazy='dynamic')
     pass
 
 @login.user_loader

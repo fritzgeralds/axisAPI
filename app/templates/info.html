@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>{{ conf.make }} {{ conf.model }}</h1>
+    <h1>{{conf.hostname}}</h1>
+    <h5>Company: {{ conf.company }}</h5>
+    <h5>Site: {{ conf.site }}</h5>
     <hr>
     <div>
         <h3>Basic Info:</h3>
-        <p><b>Firmware:</b> <i>{{ conf.fwver }}</i></p>
+        <p><b>Firmware:</b> <i>{{ conf.fwver }}</i>{% if update|length %}<br><b style="color:#f00"> New Firmware Version {{ conf.updatever }}!</b> <a href="{{ update }}">Update</a> / <a href="{{ update }}">Download</a>{% endif %}</p>
         <p><b>Hostname:</b> <i>{{ conf.hostname }}</i></p>
     </div>
     <div>

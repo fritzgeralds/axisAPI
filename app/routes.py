@@ -1,5 +1,5 @@
 from app import app, db
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from app.forms import LoginForm, ScanForm, AddCompany
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Camera, Company, Site
@@ -10,8 +10,10 @@ from werkzeug.urls import url_parse
 @app.route('/index')
 @login_required
 def index():
+    customers = Company.query.order_by(Company.name)
+    sites = Site.query.order_by(Site.name)
     cameras = Camera.query.order_by(Camera.id)
-    return render_template('index.html', title='AXIS Config Tool', cameras=cameras)
+    return render_template('index.html', title='AXIS Config Tool', cameras=cameras, customers=customers, sites=sites)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -88,10 +90,32 @@ def remove():
     db.session.commit()
     return "Nothing"
 
+@app.route('/assign')
+def assign():
+    r = ':'.join(request.args.get('q')[i:i + 2] for i in range(0, len(request.args.get('q')), 2))
+    s = request.args.get('site')
+    print(r)
+    print(s)
+    cam = Camera.query.filter_by(mac=r).first()
+    cam.site = s
+    db.session.commit()
+    return "Nothing"
+
 @app.route('/info/<ip>')
 @login_required
 def info(ip):
     cam = Camera.query.filter_by(ip=ip).first_or_404()
     conf = camera_info(ip)
     print(conf)
-    return render_template('info.html', cam=cam, conf=conf)
+    update = str(conf['update'])
+    print(update)
+    return render_template('info.html', cam=cam, conf=conf, update=update)
+
+@app.route('/get_sites/<customer>')
+def get_sites(customer):
+    company = Company.query.filter_by(name=customer).first().sites
+    sites = []
+    for site in company:
+        sites.append(site.name)
+    print(jsonify(sites))
+    return jsonify(sites)
