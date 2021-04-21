@@ -14,7 +14,7 @@
 
                 // Remove old options
                 $('#sites').find('option').remove();
-
+                $('#sites').append('<option value="">Select Site</option>')
                 // Add new items
                 $.each(data, function(key, val) {
                   var option_item = '<option value="' + val + '">' + val + '</option>'
@@ -35,9 +35,6 @@
         </select>
         <select id="sites" class="selectpicker form-control" style="width: max-content">
             <option value="">Select Site</option>
-            {% for site in sites %}
-            <option value="{{ site.name }}">{{ site.name }}</option>
-            {% endfor %}
         </select>
         <br>
     </div>
