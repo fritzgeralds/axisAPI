@@ -117,7 +117,7 @@ def camera_info(ip):
     if info['model'][0] in cams:
         c = 'PACS'
     r3 = requests.get(f"https://www.axis.com/ftp/pub/axis/software/{c}/{info['model'].replace(' ','_')}/latest/ver.txt")
-    if info['fwver'] <= r3.text:
+    if info['fwver'] < r3.text:
         info['update'] = "https://www.axis.com/ftp/pub/axis/software/" + c + "/" + info['model']\
             .replace(' ', '_') + "/latest/" + info['model'].replace(' ', '_') + ".bin"
         info['updatever'] = r3.text

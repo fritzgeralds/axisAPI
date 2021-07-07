@@ -99,6 +99,9 @@ def assign():
     cam = Camera.query.filter_by(mac=r).first()
     cam.site = s
     db.session.commit()
+    cam = Camera.query.filter_by(mac=r).first()
+    cam.company = Site.query.filter_by(name=s).first().company
+    db.session.commit()
     return "Nothing"
 
 @app.route('/info/<ip>')
@@ -106,6 +109,7 @@ def assign():
 def info(ip):
     cam = Camera.query.filter_by(ip=ip).first_or_404()
     conf = camera_info(ip)
+    conf['site'] = cam.site
     print(conf)
     update = str(conf['update'])
     print(update)

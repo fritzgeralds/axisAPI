@@ -50,13 +50,13 @@
         </thead>
         <tbody>
         {% for camera in cameras %}
-        <tr>
-            <td class="row-data">{{ camera.make }}</td>
-            <td class="row-data">{{ camera.model }}</td>
-            <td class="row-data">{{ camera.mac }}</td>
-            <td class="row-data"><a href="/info/{{ camera.ip }}">{{ camera.ip }}</a></td>
-            <td><button type="button" class="btn btn-default" id="mybutton" onclick="remove(this)">Remove</button> <button type="button" class="btn btn-default" id="siteButton" onclick="assign(this)">Assign Site</button> </td>
-        </tr>
+            <tr>
+                <td class="row-data">{{ camera.make }}</td>
+                <td class="row-data">{{ camera.model }}</td>
+                <td class="row-data">{{ camera.mac }}</td>
+                <td class="row-data"><a href="/info/{{ camera.ip }}">{{ camera.ip }}</a></td>
+                <td><button type="button" class="btn btn-default" id="mybutton" onclick="remove(this)">Remove</button> <button type="button" class="btn btn-default" id="siteButton" onclick="assign(this)">Assign Site</button> </td>
+            </tr>
         {% endfor %}
         </tbody>
     </table>
@@ -68,7 +68,7 @@
         function remove(r) {
             var i = r.parentNode.parentNode.rowIndex;
             var data = document.getElementById("myTable").rows[i];
-                $.getJSON('/remove?q=' + data.cells[3].innerText.replace(/:/g,''));
+                $.getJSON('/remove?q=' + data.cells[2].innerText.replace(/:/g,''));
             document.getElementById("myTable").deleteRow(i);
             }
         function assign(r) {
